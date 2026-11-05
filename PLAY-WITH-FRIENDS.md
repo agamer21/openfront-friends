@@ -110,3 +110,7 @@ Fixed a crash when an already-destroyed aircraft was cleaned up after losing its
 - Autosave now retains the last two completed checkpoints per account/guest in IndexedDB. Crash dialogs offer the latest safe save or previous checkpoint, each timestamped. Recovery continues locally; use Multiplayer/Rejoin for the shared online timeline. A crashed worker's failed snapshot does not replace a completed save. Storage clearing and incompatible future snapshots can still prevent recovery.
 
 Checks: 21 targeted feature, party/reconnect, chat and control tests passed. A real-browser IndexedDB check confirmed two-checkpoint rotation, preservation after a failed snapshot, and dispatching the selected recovery checkpoint. That storage check uses bounded fixture bytes and does not claim a full resumed simulation. No exhaustive multiplayer battles, end-to-end pact negotiation or full live-room crash recovery were run for this release.
+
+## Hosting origin correction - 2026-11-05
+
+Pages builds derive map/image/worker CDN_BASE from GITHUB_REPOSITORY owner; PAGES_ORIGIN remains an explicit override. Local builds default to https://agamer21.github.io . This fixes missing World thumbnails and solo map.bin/map4x.bin fetch failures after moving the site. Brief browser check loaded an actual World thumbnail and started a solo simulation past five ticks with no old-domain requests or error modal. Refresh existing tabs after deployment.

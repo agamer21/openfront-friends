@@ -5,11 +5,10 @@ import fs from "node:fs/promises";
 // Vite bundles use the Pages project path; all map/audio/worker asset URLs
 // use the same base, including assets fetched inside simulation workers.
 const base = process.env.PAGES_BASE ?? "/openfront-friends/";
-const cdnBase =
-  `${process.env.PAGES_ORIGIN ?? "https://agames21.github.io"}${base}`.replace(
-    /\/$/,
-    "",
-  );
+// A fork must serve its maps and previews from its own Pages origin.
+const owner = process.env.GITHUB_REPOSITORY?.split("/")[0]?.toLowerCase();
+const origin = process.env.PAGES_ORIGIN ?? (owner ? `https://${owner}.github.io` : "https://agamer21.github.io");
+const cdnBase = `${origin}${base}`.replace(/\/$/, "");
 const build = spawnSync(
   process.execPath,
   [process.env.npm_execpath, "run", "build-prod"],
