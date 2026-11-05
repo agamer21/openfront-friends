@@ -1,5 +1,14 @@
 {
   "rules": {
+    "arcadePresence": {
+      ".read": "auth != null",
+      "$uid": {
+        "$tab": {
+          ".write": "auth != null && auth.uid === $uid && $tab.length <= 64",
+          ".validate": "newData.isBoolean() && newData.val() === true"
+        }
+      }
+    },
     ".read": false,
     ".write": false,
     "queue": {

@@ -26,6 +26,16 @@ jobs:
       - run: npm install --global --ignore-scripts npm@12.1.0
       - run: npm ci --ignore-scripts
       - run: npm run build:pages
+      - name: Include shared arcade online counter
+        run: |
+          python3 - <<'PY'
+          from pathlib import Path
+          p = Path("static/index.html")
+          text = p.read_text()
+          script = '<script type="module" src="/assets/arcade/presence.js"></script>'
+          if script not in text:
+              p.write_text(text.replace('</body>', script + '</body>'))
+          PY
       - uses: actions/configure-pages@v6
       - uses: actions/upload-pages-artifact@v5
         with:
