@@ -3,7 +3,10 @@
     visibility: hidden !important;
   }
   .friends-hud-managed:has(.friends-game-tools[open]) game-left-sidebar > aside,
-  .friends-hud-managed:has(.friends-game-tools[open]) game-left-sidebar > aside * {
+  .friends-hud-managed:has(.friends-game-tools[open])
+    game-left-sidebar
+    > aside
+    * {
     visibility: hidden !important;
   }
 }
@@ -11,6 +14,9 @@
   width: calc(100vw - 24px) !important;
   max-width: 1190px;
   margin-inline: auto;
+}
+.friends-hud-managed .world-war-banner {
+  display: none !important;
 }
 .friends-hud-managed #friends-control-dock {
   width: 100% !important;

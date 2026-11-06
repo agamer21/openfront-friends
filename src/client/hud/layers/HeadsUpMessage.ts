@@ -188,6 +188,16 @@ export class HeadsUpMessage extends LitElement implements Controller {
       elapsed >= overtimeStart &&
       elapsed < overtimeStart + HeadsUpMessage.OVERTIME_NOTICE_SECONDS;
 
+    // The hosted world-status HUD already shows the live protection countdown.
+    // Avoid a second centered immunity banner covering compact leaderboards.
+    if (
+      process.env.FRIENDS_STATIC === "true" &&
+      this.game.config().hasExtendedSpawnImmunity() &&
+      !this.game.config().gameConfig().friendsMode &&
+      !this.game.inSpawnPhase()
+    )
+      this.isImmunityActive = false;
+
     // The onboarding tutorial's own card says where to spawn.
     this.isVisible =
       (this.game.inSpawnPhase() &&
