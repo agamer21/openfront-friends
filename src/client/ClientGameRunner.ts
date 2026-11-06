@@ -1,6 +1,5 @@
 import { TileRef } from "@openfront/engine-api/game/GameMap";
 import {
-  GameType,
   BuildableUnit,
   PlayerType,
   Structures,
@@ -12,11 +11,7 @@ import {
   GameUpdateViewData,
   HashUpdate,
 } from "@openfront/engine-api/game/GameUpdates";
-import {
-  FriendsAdminIntentSchema,
-  ClientID,
-  GameID,
-} from "@openfront/engine-api/Schemas";
+import { ClientID, GameID } from "@openfront/engine-api/Schemas";
 import { Config } from "@openfront/engine-lib/configuration/Config";
 import { TerrainMapData } from "@openfront/engine-lib/game/TerrainMapLoader";
 import { findClosestBy } from "@openfront/engine-lib/Util";
@@ -1217,34 +1212,6 @@ export class ClientGameRunner {
             `got wrong turn have turns ${this.turnsSeen}, received turn ${message.turn.turnNumber}`,
           );
         } else {
-          // Mirror committed host settings for UI capacity/cost calculations.
-          // The worker independently validates and applies the authoritative command.
-          for (const intent of message.turn.intents) {
-            if (intent.type !== "friends_admin") continue;
-            const parsed = FriendsAdminIntentSchema.safeParse(intent);
-            const player = this.gameView.playerByClientID(intent.clientID);
-            const config = this.gameView.config().gameConfig();
-            if (
-              !parsed.success ||
-              !player?.isAlive() ||
-              !player.isLobbyCreator()
-            )
-              continue;
-            if (
-              config.gameType !== GameType.Singleplayer &&
-              !(config.gameType === GameType.Private && config.friendsAdmin)
-            )
-              continue;
-            if (
-              parsed.data.action === "infiniteGold" ||
-              parsed.data.action === "infiniteTroops"
-            ) {
-              config.hostCheats = {
-                ...config.hostCheats,
-                [parsed.data.action]: parsed.data.enabled,
-              };
-            }
-          }
           this.worker.sendTurn(
             // Filter out pause intents in replays
             this.gameView.config().isReplay()

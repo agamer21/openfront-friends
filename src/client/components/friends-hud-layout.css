@@ -1,0 +1,197 @@
+@media (max-width: 900px) {
+  .friends-hud-managed:has(.friends-game-tools[open]) game-left-sidebar {
+    visibility: hidden !important;
+  }
+  .friends-hud-managed:has(.friends-game-tools[open]) game-left-sidebar > aside,
+  .friends-hud-managed:has(.friends-game-tools[open]) game-left-sidebar > aside * {
+    visibility: hidden !important;
+  }
+}
+.friends-hud-managed #friends-hud-stack {
+  width: calc(100vw - 24px) !important;
+  max-width: 1190px;
+  margin-inline: auto;
+}
+.friends-hud-managed #friends-control-dock {
+  width: 100% !important;
+  box-sizing: border-box;
+}
+.friends-hud-managed control-panel,
+.friends-hud-managed unit-display {
+  width: 100%;
+  min-width: 0;
+}
+.friends-hud-managed unit-display > div {
+  max-width: 100%;
+  overflow-x: auto;
+  scrollbar-width: thin;
+}
+.friends-hud-managed #friends-hud-stack > tutorial-panel {
+  position: fixed !important;
+  left: max(12px, calc((100vw - 1190px)/2)) !important;
+  top: auto !important;
+  bottom: var(--friends-hud-bottom, 210px) !important;
+  width: min(500px, calc(100vw - 160px)) !important;
+  max-width: none !important;
+  transform: none !important;
+  max-height: min(
+    230px,
+    calc(
+      100dvh - var(--friends-hud-bottom, 210px) - var(--friends-hud-top, 120px)
+    )
+  );
+  overflow-y: auto;
+  pointer-events: auto;
+}
+.friends-hud-managed tutorial-panel > div {
+  width: 100%;
+  max-width: 100%;
+  box-sizing: border-box;
+}
+.friends-game-tools {
+  position: fixed;
+  right: 12px;
+  bottom: var(--friends-hud-bottom, 210px);
+  z-index: 950;
+  width: 116px;
+  max-height: max(
+    48px,
+    calc(
+      100dvh - var(--friends-hud-top, 120px) - var(--friends-hud-bottom, 210px)
+    )
+  );
+  border: 1px solid #405574;
+  border-radius: 10px;
+  background: #142138;
+  color: #edf2ff;
+  box-shadow: 0 5px 20px #0006;
+  font: 12px/1.5 system-ui;
+  box-sizing: border-box;
+  overflow: hidden;
+}
+.friends-game-tools[open] {
+  width: min(340px, calc(100vw - 24px));
+}
+.friends-game-tools > summary {
+  min-height: 44px;
+  padding: 12px 16px;
+  box-sizing: border-box;
+  cursor: pointer;
+  font-weight: 750;
+  list-style: none;
+}
+.friends-game-tools > summary span {
+  float: right;
+  color: #ffce59;
+}
+.friends-tools-content {
+  overflow-y: auto;
+  max-height: max(
+    40px,
+    calc(
+      100dvh - var(--friends-hud-top, 120px) -
+        var(--friends-hud-bottom, 210px) - 46px
+    )
+  );
+  padding: 12px;
+  display: grid;
+  gap: 12px;
+  box-sizing: border-box;
+}
+.friends-game-tools:not([open]) > .friends-tools-content {
+  display: none;
+}
+.friends-hud-managed .friends-game-tools .ft-panel,
+.friends-hud-managed .friends-game-tools .command-fieldguide,
+.friends-hud-managed .friends-game-tools .command-guidecards,
+.friends-hud-managed .friends-game-tools friends-chat,
+.friends-hud-managed .friends-game-tools .arcade-return {
+  position: static !important;
+  inset: auto !important;
+  transform: none !important;
+  width: 100%;
+  max-width: 100%;
+  margin: 0;
+  box-sizing: border-box;
+}
+.friends-game-tools .ft-body {
+  max-height: 260px;
+}
+.friends-game-tools .command-guidecards {
+  margin-top: 8px !important;
+  box-shadow: none;
+}
+.friends-game-tools .command-fieldguide > button {
+  width: 100%;
+  min-height: 44px;
+}
+.friends-game-tools .arcade-return {
+  display: block;
+  min-height: 44px;
+}
+.friends-game-tools summary:focus-visible {
+  outline: 2px solid #ffce59;
+  outline-offset: -4px;
+}
+.friends-hud-managed game-left-sidebar {
+  position: fixed !important;
+  left: 12px !important;
+  top: 12px !important;
+  max-height: var(--friends-sidebar-height, 400px);
+  overflow-y: auto;
+  z-index: 800;
+}
+.friends-hud-managed game-left-sidebar > aside {
+  transition: none !important;
+  position: static !important;
+  inset: auto !important;
+  margin-top: 0 !important;
+  max-height: var(--friends-sidebar-height, 400px) !important;
+  max-width: 100%;
+}
+.friends-hud-managed unit-display .command-unit-button {
+  min-width: 44px;
+  min-height: 44px;
+}
+.friends-hud-managed .friends-mission-hud {
+  top: var(--friends-world-bottom, 110px);
+}
+.friends-hud-managed
+  #friends-bottom-hud
+  > div:last-child:not(#friends-hud-stack) {
+  top: var(--friends-world-bottom, 110px) !important;
+  bottom: auto !important;
+  left: 50% !important;
+  right: auto !important;
+  transform: translateX(-50%);
+  width: min(384px, calc(100vw - 24px)) !important;
+  max-height: min(
+    240px,
+    max(
+      0px,
+      calc(
+        100dvh - var(--friends-world-bottom, 110px) -
+          var(--friends-hud-bottom, 210px) - 242px
+      )
+    )
+  ) !important;
+  overflow-y: auto !important;
+}
+@media (max-width: 1100px) {
+  .friends-hud-managed friends-world-status {
+    top: 52px !important;
+  }
+  .friends-hud-managed game-left-sidebar {
+    top: max(146px, var(--friends-hud-top, 146px)) !important;
+    max-height: var(--friends-sidebar-height, 300px);
+    max-width: min(280px, calc(100vw - 24px));
+  }
+}
+@media (max-width: 900px) {
+  .friends-hud-managed:has(.friends-game-tools[open])
+    #friends-hud-stack
+    > tutorial-panel,
+  .friends-hud-managed:has(.friends-game-tools[open]) game-left-sidebar {
+    visibility: hidden;
+  }
+}

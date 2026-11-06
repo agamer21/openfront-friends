@@ -42,7 +42,7 @@ type ListedRoom = {
   createdAt: number;
 };
 type Member = { uid: string; clientID: string; name: string };
-const VERSION = "friends-v4-admin-20261106";
+const VERSION = "friends-v5-fair-20261106";
 export const MATCH_WAIT_MS = 20_000;
 export function normalMatch(
   gameID: string,
@@ -60,7 +60,7 @@ export function normalMatch(
     })),
     config: {
       friendsAircraft: true,
-      friendsAdmin: true,
+      friendsAdmin: false,
       gameMap: GameMapType.World,
       gameMapSize: GameMapSize.Compact,
       gameType: online ? GameType.Private : GameType.Singleplayer,

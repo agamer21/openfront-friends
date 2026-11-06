@@ -16,6 +16,12 @@ import {
 } from "firebase/database";
 import type { LobbyConfig } from "./ClientGameRunner";
 import { readRoomChat } from "./FriendsChatTransport";
+import {
+  checkedPeerTurn,
+  parsePeerIntent,
+  PeerInputLimiter,
+  secureRoomStartInfo,
+} from "./FriendsFairPlay";
 import { friendsDB } from "./FriendsFirebase";
 import { memberRoom, savePartyResume } from "./FriendsParty";
 import type { FriendsSession } from "./FriendsRelay";
@@ -35,6 +41,7 @@ export class FriendsPartyRelay {
   private message: (message: ServerMessage) => void = () => {};
   private turns: StoredTurn[] = [];
   private consumed = new Set<string>();
+  private inputLimiter = new PeerInputLimiter();
   private pending = new Map<string, StampedIntent>();
   private acks: Record<string, number> = {};
   private executed = 0;
@@ -46,6 +53,7 @@ export class FriendsPartyRelay {
   private waiting = false;
   private lastAdvance = Date.now();
   constructor(private config: LobbyConfig) {
+    secureRoomStartInfo(config.gameStartInfo!);
     this.session = config.friendsSession!;
   }
   updateCallback(
@@ -178,7 +186,10 @@ export class FriendsPartyRelay {
             if (this.consumed.has(key)) return;
             let intent: StampedIntent;
             try {
-              intent = JSON.parse(snapshot.val());
+              const value = snapshot.val();
+              if (typeof value !== "string" || value.length > 4096) return;
+              intent = JSON.parse(value);
+              if (!intent || typeof intent !== "object") return;
             } catch {
               return;
             }
@@ -211,7 +222,14 @@ export class FriendsPartyRelay {
               ].includes(intent.type)
             )
               return;
-            this.pending.set(key, { ...intent, clientID: member.clientID });
+            const parsed = parsePeerIntent(intent, member.clientID);
+            if (
+              !parsed ||
+              this.pending.size >= 128 ||
+              !this.inputLimiter.allow(member.clientID)
+            )
+              return;
+            this.pending.set(key, parsed);
           }),
         );
       }
@@ -227,6 +245,14 @@ export class FriendsPartyRelay {
     this.timer = setInterval(() => this.tick(), 100);
   }
   private acceptTurn(turn: StoredTurn) {
+    const checked = checkedPeerTurn(
+      turn,
+      new Set(this.session.party!.members.map((member) => member.clientID)),
+    );
+    if (!checked) {
+      this.fail("Invalid multiplayer action detected. Start a new room.");
+      return;
+    }
     if (this.stopped || turn.turnNumber < this.turns.length) return;
     if (turn.turnNumber !== this.turns.length) {
       this.fail("Match history is incomplete. Try Rejoin match.");

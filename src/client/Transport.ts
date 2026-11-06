@@ -7,7 +7,6 @@ import {
   Tick,
   UnitType,
 } from "@openfront/engine-api/game/GameTypes";
-import type { FriendsAdminIntent } from "@openfront/engine-api/Schemas";
 import {
   AllPlayersStats,
   ClientID,
@@ -64,10 +63,6 @@ import { LocalServer } from "./LocalServer";
 import { describeSocketClose } from "./SocketClose";
 import { homeHref, translateText } from "./Utils";
 import { PlayerView } from "./view";
-
-export class FriendsAdminIntentEvent implements GameEvent {
-  constructor(public readonly intent: FriendsAdminIntent) {}
-}
 
 export class PauseGameIntentEvent implements GameEvent {
   constructor(public readonly paused: boolean) {}
@@ -325,9 +320,6 @@ export class Transport {
     );
     this.subscribe(SendBreakAllianceIntentEvent, (e) =>
       this.onBreakAllianceRequestUIEvent(e),
-    );
-    this.subscribe(FriendsAdminIntentEvent, (event) =>
-      this.sendIntent(event.intent),
     );
     this.subscribe(SetIntentGateEvent, (e) => (this.intentGate = e.gate));
     this.subscribe(SendSpawnIntentEvent, (e) => this.onSendSpawnIntentEvent(e));

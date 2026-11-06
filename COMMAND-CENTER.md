@@ -1,3 +1,15 @@
+# Command center: current behavior
+
+Host controls and the white dot were removed at the owner's request. Legacy grant packets are inert in the engine, including solo and replays. Multiplayer input and ordered turns are validated; player identity comes from the authenticated input path. Unsupported control/resource packets, malformed actions and input floods are rejected. Room starts cannot claim solo mode or carry host/infinite-resource privileges. See FAIR-PLAY.md for scope and security limits.
+
+In-game chat, diplomacy, Field Guide and the arcade link are grouped under Tools. The drawer and tutorial reserve measured space above the battle dock. The leaderboard is below the world-status bar on compact screens; optional hints and leaderboard hide while the compact Tools drawer is open. Unit build targets are at least 44px high on mobile. Notifications have a bounded scroll area.
+
+Validation: 35 targeted tests, production build/TypeScript and scoped lint passed. Isolated Chrome checked six viewport sizes (1440×900, 1024×900, 768×900, 390×844, 320×640, 1024×600), with Tools closed/open and all nested tools expanded. The visible leaderboard aside is included in collision checks, not merely its wrapper. No tested HUD frame overlaps or horizontal document overflow remained. Two actual authenticated browsers over real Firebase rejected forged grant/config/malformed inputs, denied cross-player writes, advanced the shared simulation and exchanged chat after drawer relocation. Temporary accounts and known rooms were removed. Physical mobile keyboards, every contextual popup, 2v2 and full matches were not exhaustively checked.
+
+## Historical implementation and validation notes
+
+The records below describe earlier versions. Their host-control availability and old verification limits are superseded by the current behavior above.
+
 # Command-center update
 
 - New responsive command-center home screen, illustrated globe, original SVG icons, and four campaign cards.

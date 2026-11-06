@@ -1,6 +1,11 @@
 import { LitElement, html, css } from "lit";
 import { customElement, state } from "lit/decorators.js";
-import { connectRoomChat, setRoomChatSession, type RoomChatSession } from "../FriendsChatTransport";
+import {
+  connectRoomChat,
+  getRoomChatSession,
+  setRoomChatSession,
+  type RoomChatSession,
+} from "../FriendsChatTransport";
 
 @customElement("friends-chat")
 export class FriendsChat extends LitElement {
@@ -176,6 +181,11 @@ export class FriendsChat extends LitElement {
   };
   connectedCallback() {
     super.connectedCallback();
+    const currentRoom = getRoomChatSession();
+    if (currentRoom)
+      this.changeSession(
+        new CustomEvent("friends-chat-session", { detail: currentRoom }),
+      );
     document.addEventListener("friends-chat-session", this.changeSession);
     document.addEventListener("friends-chat-send-tool", this.sendTool);
     document.addEventListener("join-lobby", this.reset);

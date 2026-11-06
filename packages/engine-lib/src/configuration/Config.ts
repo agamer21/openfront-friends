@@ -91,7 +91,25 @@ export class Config {
     private _isReplay: boolean,
     public readonly listed: boolean = false,
     private _spectator: boolean = false,
-  ) {}
+  ) {
+    // Multiplayer never trusts host-supplied sandbox/resource privilege flags.
+    if (this._gameConfig.gameType === GameType.Private) {
+      Object.assign(this._gameConfig, {
+        hostCheats: undefined,
+        friendsAdmin: false,
+        infiniteGold: false,
+        infiniteTroops: false,
+        instantBuild: false,
+        goldMultiplier: 1,
+      });
+      if (
+        ![50_000, 500_000, 2_000_000].includes(
+          this._gameConfig.startingGold ?? 50_000,
+        )
+      )
+        this._gameConfig.startingGold = 50_000;
+    }
+  }
 
   isReplay(): boolean {
     return this._isReplay;

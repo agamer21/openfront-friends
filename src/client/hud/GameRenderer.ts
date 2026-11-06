@@ -3,7 +3,7 @@ import { Controller } from "../Controller";
 import { AmbienceController } from "../controllers/AmbienceController";
 import { AttackingTroopsController } from "../controllers/AttackingTroopsController";
 import { BuildPreviewController } from "../controllers/BuildPreviewController";
-import { FriendsAdminPanel } from "../controllers/FriendsAdminPanel";
+import { FriendsHudLayout } from "../controllers/FriendsHudLayout";
 import { FriendsTactics } from "../controllers/FriendsTactics";
 import { HoverHighlightController } from "../controllers/HoverHighlightController";
 import { LiveStatsController } from "../controllers/LiveStatsController";
@@ -338,7 +338,7 @@ export function createRenderer(
   const layers: Controller[] = [
     new FriendsContentOverlay(game, transformHandler, view),
     new FriendsTactics(game, transformHandler, eventBus),
-    new FriendsAdminPanel(game, eventBus),
+    new FriendsHudLayout(),
     new WarshipSelectionController(game, eventBus, transformHandler, view),
     new BuildPreviewController(
       game,

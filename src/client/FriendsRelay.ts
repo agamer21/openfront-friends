@@ -10,6 +10,12 @@ import {
   Unsubscribe,
 } from "firebase/database";
 import type { LobbyConfig } from "./ClientGameRunner";
+import {
+  checkedPeerTurn,
+  parsePeerIntent,
+  PeerInputLimiter,
+  secureRoomStartInfo,
+} from "./FriendsFairPlay";
 import { friendsDB } from "./FriendsFirebase";
 
 export interface FriendsSession {
@@ -27,6 +33,7 @@ export class FriendsRelay {
   private off: Unsubscribe[] = [];
   private timer: ReturnType<typeof setInterval>;
   private intents: StampedIntent[] = [];
+  private inputLimiter = new PeerInputLimiter();
   private turns: Turn[] = [];
   private executed = 0;
   private acks: Record<string, number> = {};
@@ -36,6 +43,7 @@ export class FriendsRelay {
   private lastActivity = Date.now();
   private session: FriendsSession;
   constructor(private config: LobbyConfig) {
+    secureRoomStartInfo(config.gameStartInfo!);
     this.session = config.friendsSession!;
   }
   private path(suffix: string) {
@@ -73,7 +81,14 @@ export class FriendsRelay {
     this.off.push(
       onChildAdded(this.path("turns"), (snapshot) => {
         if (this.continuingAlone || this.stopped) return;
-        const turn = JSON.parse(snapshot.val()) as Turn;
+        const turn = checkedPeerTurn(
+          snapshot.val(),
+          new Set(this.config.gameStartInfo!.players.map((p) => p.clientID)),
+        );
+        if (!turn) {
+          this.fail("Invalid multiplayer action detected. Start a new match.");
+          return;
+        }
         if (turn.turnNumber !== this.turns.length) {
           this.fail(
             "Multiplayer turns arrived out of order. Please return to the menu.",
@@ -119,18 +134,14 @@ export class FriendsRelay {
       ]) {
         this.off.push(
           onChildAdded(this.path(`inputs/${uid}`), (x) => {
-            const intent = JSON.parse(x.val());
-            // These controls belong to a local simulation or lobby, never an online peer.
+            const intent = parsePeerIntent(x.val(), clientID);
             if (
-              [
-                "toggle_pause",
-                "kick_player",
-                "update_game_config",
-                "change_game_mode",
-              ].includes(intent.type)
+              !intent ||
+              this.intents.length >= 128 ||
+              !this.inputLimiter.allow(clientID)
             )
               return;
-            this.intents.push({ ...intent, clientID });
+            this.intents.push(intent);
           }),
         );
       }

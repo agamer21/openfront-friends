@@ -11,7 +11,7 @@ import type { WireGameStartInfo } from "@openfront/shared/WireSchemas";
 import type { FriendsSession } from "./FriendsRelay";
 import { roomSettings, type FriendsRoomSettings } from "./FriendsRoomSettings";
 
-export const PARTY_VERSION = "friends-party-v3-admin-20261106";
+export const PARTY_VERSION = "friends-party-v4-fair-20261106";
 export const PARTY_MAPS = [
   GameMapType.World,
   GameMapType.Europe,
@@ -69,7 +69,7 @@ export function partyStart(
     })),
     config: {
       friendsAircraft: settings.aircraft,
-      friendsAdmin: true,
+      friendsAdmin: false,
       ...(activity !== "standard"
         ? {
             friendsMode: activity,

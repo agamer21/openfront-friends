@@ -20,7 +20,6 @@ import { DonateTroopsExecution } from "./DonateTroopExecution";
 import { EmbargoAllExecution } from "./EmbargoAllExecution";
 import { EmbargoExecution } from "./EmbargoExecution";
 import { EmojiExecution } from "./EmojiExecution";
-import { applyFriendsAdmin } from "./FriendsAdmin";
 import { MarkDisconnectedExecution } from "./MarkDisconnectedExecution";
 import { MoveWarshipExecution } from "./MoveWarshipExecution";
 import { NationExecution } from "./NationExecution";
@@ -68,7 +67,7 @@ export class Executor {
     // create execution
     switch (intent.type) {
       case "friends_admin":
-        applyFriendsAdmin(this.mg, player, intent);
+        // Legacy resource-grant packets are deliberately inert, including replays.
         return new NoOpExecution();
       case "attack": {
         return new AttackExecution(
