@@ -585,7 +585,7 @@ export class FriendsPartyLobby extends LitElement {
                   Create room
                 </button>
               </div>
-              <form
+              <form class="party-join"
                 @submit=${(event: Event) => {
                   event.preventDefault();
                   void this.join();
