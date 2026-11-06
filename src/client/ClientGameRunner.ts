@@ -1,6 +1,6 @@
 import { TileRef } from "@openfront/engine-api/game/GameMap";
-import { GameType } from "@openfront/engine-api/game/GameTypes";
 import {
+  GameType,
   BuildableUnit,
   PlayerType,
   Structures,
@@ -12,8 +12,11 @@ import {
   GameUpdateViewData,
   HashUpdate,
 } from "@openfront/engine-api/game/GameUpdates";
-import { FriendsAdminIntentSchema } from "@openfront/engine-api/Schemas";
-import { ClientID, GameID } from "@openfront/engine-api/Schemas";
+import {
+  FriendsAdminIntentSchema,
+  ClientID,
+  GameID,
+} from "@openfront/engine-api/Schemas";
 import { Config } from "@openfront/engine-lib/configuration/Config";
 import { TerrainMapData } from "@openfront/engine-lib/game/TerrainMapLoader";
 import { findClosestBy } from "@openfront/engine-lib/Util";

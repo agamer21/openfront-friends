@@ -974,6 +974,10 @@ function cosmeticsJsonUrl(): string {
 }
 
 export async function fetchCosmetics(): Promise<Cosmetics | null> {
+  // Hosted edition has no upstream catalog backend; use the existing defaults.
+  // Avoid failed localhost requests and their retry/timeout overhead.
+  if (process.env.FRIENDS_STATIC === "true" && __cosmetics === null)
+    return null;
   if (__cosmetics !== null) {
     return __cosmetics;
   }
