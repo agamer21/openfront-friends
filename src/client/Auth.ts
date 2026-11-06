@@ -7,6 +7,7 @@ import { getApiBase, getAudience } from "./Api";
 import { ClientEnv } from "./ClientEnv";
 import type { DesktopSessionState, SessionFailureKind } from "./DesktopShell";
 import { desktopLinkGate, isDesktopShell } from "./DesktopShell";
+import { openFriendsAccount } from "./FriendsAccount";
 import { gamePortal, type GamePortalName } from "./GamePortal";
 import { showInGameAlert } from "./InGameModal";
 import type { SteamTicketResult } from "./SteamSDK";
@@ -96,12 +97,20 @@ function startDesktopLinkFlow(): boolean {
 }
 
 export function discordLogin() {
+  if (process.env.FRIENDS_STATIC === "true") {
+    void openFriendsAccount(false);
+    return;
+  }
   if (startDesktopLinkFlow()) return;
   const redirectUri = encodeURIComponent(window.location.href);
   window.location.href = `${getApiBase()}/auth/login/discord?redirect_uri=${redirectUri}`;
 }
 
 export function googleLogin() {
+  if (process.env.FRIENDS_STATIC === "true") {
+    void openFriendsAccount(true);
+    return;
+  }
   if (startDesktopLinkFlow()) return;
   const redirectUri = encodeURIComponent(window.location.href);
   window.location.href = `${getApiBase()}/auth/login/google?redirect_uri=${redirectUri}`;
@@ -116,6 +125,10 @@ export function googleLogin() {
 // than broken -- the caller hides it on the desktop shell instead. Keeping the
 // guard out of here means the function does exactly one thing.
 export function steamLogin() {
+  if (process.env.FRIENDS_STATIC === "true") {
+    void openFriendsAccount(false);
+    return;
+  }
   const redirectUri = encodeURIComponent(window.location.href);
   window.location.href = `${getApiBase()}/auth/login/steam?redirect_uri=${redirectUri}`;
 }

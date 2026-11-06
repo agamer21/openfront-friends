@@ -40,3 +40,7 @@ Home now emphasizes Play Solo, with separate Multiplayer and Missions cards, act
 World-status polling skips hidden tabs and unchanged simulation ticks. Its game/tick cache resets when leaving gameplay, so a replacement game is always refreshed. This reduces redundant HUD work; it is not an overall FPS benchmark. Mission HUD uses an opaque surface instead of filtering the moving map.
 
 Validation: production Pages build/TypeScript passed; eight targeted tests passed, including world-status pause/visibility/cache regression. Targeted lint passed. Isolated Chrome against locally built artifacts verified navigation, missions, guide, chat positioning, 320/390 menus, a real solo World simulation, the 25% attack action, desktop dock geometry and 390 gameplay without horizontal document overflow or JS page errors. Full matches, multiplayer and sustained FPS are untested. Owner authorized push/publication on 2026-11-06. Release deployment and live validation are recorded in the project vault.
+
+## Hosted account sign-in fix (2026-11-06)
+Hosted provider entry points now use Firebase instead of the original server OAuth API. Solo setup says Multiplayer account rather than promising unsupported official achievements. The account panel explains local solo saves and achievement limits. Production build and 16 focused tests passed; isolated Chrome opened the real Google login popup without localhost navigation. Personal Google sign-in was not completed. Unrelated upstream cosmetics requests to localhost remain a follow-up issue.
+

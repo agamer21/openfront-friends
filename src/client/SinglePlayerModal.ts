@@ -20,16 +20,17 @@ import { customElement, state } from "lit/decorators.js";
 import { translateText } from "../client/Utils";
 import { responseHasLinkedIdentity } from "./AccountIdentity";
 import { BaseModal } from "./components/BaseModal";
+import { MEDAL_ORDER, medalIcon } from "./components/map/Medals";
 import "./components/baseComponents/Button";
 import "./components/baseComponents/Modal";
-import { MEDAL_ORDER, medalIcon } from "./components/map/Medals";
 import {
   type LoadSavedGameDetail,
   savedGameIdFrom,
 } from "./components/SavedGamesPanel";
-import "./components/GameConfigSettings";
 import { modalHeader } from "./components/ui/ModalHeader";
+import "./components/GameConfigSettings";
 import { getPlayerCosmetics, prewarmCosmetics } from "./Cosmetics";
+import { openFriendsAccount } from "./FriendsAccount";
 import "./components/ToggleInputCard";
 import { missionConfig } from "./FriendsMissionCatalog";
 import {
@@ -325,11 +326,15 @@ export class SinglePlayerModal extends BaseModal {
     return html`<button
       class="px-3 py-2 text-xs font-bold uppercase tracking-wider transition-colors duration-200 rounded-lg bg-yellow-500/20 text-yellow-400 border border-yellow-500/30 whitespace-nowrap shrink-0 cursor-pointer hover:bg-yellow-500/30"
       @click=${() => {
+        if (process.env.FRIENDS_STATIC === "true") {
+          void openFriendsAccount();
+          return;
+        }
         this.close();
         window.showPage?.("page-account");
       }}
     >
-      ${translateText("single_modal.sign_in_for_achievements")}
+      ${process.env.FRIENDS_STATIC === "true" ? "Multiplayer account" : translateText("single_modal.sign_in_for_achievements")}
     </button>`;
   }
 

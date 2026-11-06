@@ -158,6 +158,17 @@ export class FriendsOnline extends LitElement {
     this.status = "";
     this.watchServers();
   }
+  openAccount(google = false) {
+    this.open();
+    this.status =
+      "Sign in for multiplayer. Solo progress saves on this device; official OpenFront achievements are not available in this edition.";
+    if (google && !this.user) void this.googleSignIn();
+  }
+  private googleSignIn() {
+    return this.action(() =>
+      signInWithPopup(friendsAuth, new GoogleAuthProvider()),
+    );
+  }
   private async loadDisplayName(user: User) {
     try {
       const snapshot = await get(
@@ -744,7 +755,7 @@ export class FriendsOnline extends LitElement {
                 <button
                   class="fo-primary fo-google"
                   ?disabled=${this.busy}
-                  @click=${() => this.action(() => signInWithPopup(friendsAuth, new GoogleAuthProvider()))}
+                  @click=${() => this.googleSignIn()}
                 >
                   Continue with Google <span aria-hidden="true">↗</span>
                 </button>
