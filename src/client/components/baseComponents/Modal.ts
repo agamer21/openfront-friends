@@ -1,4 +1,4 @@
-import { LitElement, PropertyValues, html } from "lit";
+import { LitElement, PropertyValues, html, css } from "lit";
 import { customElement, property, query, state } from "lit/decorators.js";
 import { prefersReducedMotion } from "../../utilities/ReducedMotion";
 import { translateText } from "../../Utils";
@@ -8,7 +8,42 @@ export type OModalTab = { key: string; label: string };
 
 @customElement("o-modal")
 export class OModal extends LitElement {
-  static styles = [documentStylesSheet()];
+  static styles = [
+    documentStylesSheet(),
+    css`
+      section:not(.graphics-panel-surface) {
+        background: #101a2e;
+        backdrop-filter: none;
+        border: 1px solid #354560;
+        border-radius: 16px;
+        box-shadow: 0 24px 70px #0007;
+      }
+      [role="tablist"] {
+        background: #152139;
+        border-color: #354560;
+        padding: 8px 12px;
+        gap: 6px;
+      }
+      [role="tab"] {
+        border-radius: 8px;
+        color: #b6c6e0;
+        min-height: 44px;
+      }
+      [role="tab"][aria-selected="true"] {
+        color: #ffcf61;
+        background: #29364e;
+      }
+      [data-modal-scroll] {
+        scrollbar-width: thin;
+        scrollbar-color: #4b6081 #101a2e;
+      }
+      @media (max-width: 680px) {
+        section:not(.graphics-panel-surface) {
+          border-radius: 0;
+        }
+      }
+    `,
+  ];
 
   @state() public isModalOpen = false;
 

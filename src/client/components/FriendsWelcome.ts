@@ -19,6 +19,7 @@ import "./friends-arcade.css";
 import "./friends-lobby.css";
 import "./friends-home.css";
 import "./friends-refresh.css";
+import "./friends-menus.css";
 
 @customElement("friends-welcome")
 export class FriendsWelcome extends LitElement {

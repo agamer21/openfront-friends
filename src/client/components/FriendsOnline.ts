@@ -80,6 +80,36 @@ export function normalMatch(
 @customElement("friends-online")
 export class FriendsOnline extends LitElement {
   @state() private opened = false;
+  @state() private section: "friends" | "servers" = "friends";
+  private returnFocus: HTMLElement | null = null;
+  private async closePanel() {
+    await this.cancelQueue?.();
+    this.opened = false;
+    this.directoryOff?.();
+    this.returnFocus?.focus();
+  }
+  private dialogKey = (event: KeyboardEvent) => {
+    if (event.key === "Escape") {
+      event.preventDefault();
+      void this.closePanel();
+    }
+    if (event.key !== "Tab") return;
+    const nodes = [
+      ...this.querySelectorAll<HTMLElement>(
+        "button:not(:disabled), input:not(:disabled), select:not(:disabled), summary, a[href]",
+      ),
+    ].filter((n) => n.getClientRects().length);
+    const first = nodes[0],
+      last = nodes[nodes.length - 1];
+    if (event.shiftKey && document.activeElement === first) {
+      event.preventDefault();
+      last?.focus();
+    }
+    if (!event.shiftKey && document.activeElement === last) {
+      event.preventDefault();
+      first?.focus();
+    }
+  };
   @state() private roomActivity: "standard" | "survival" | "capture" =
     "standard";
   @state() private user: User | null = null;
@@ -153,10 +183,16 @@ export class FriendsOnline extends LitElement {
     this.opened = true;
   };
   open(activity: "standard" | "survival" | "capture" = "standard") {
+    this.returnFocus = document.activeElement as HTMLElement;
     this.roomActivity = activity;
     this.opened = true;
     this.status = "";
     this.watchServers();
+    void this.updateComplete.then(() =>
+      this.querySelector<HTMLElement>(
+        "[aria-label='Close multiplayer']",
+      )?.focus(),
+    );
   }
   openAccount(google = false) {
     this.open();
@@ -668,7 +704,7 @@ export class FriendsOnline extends LitElement {
         Save name
       </button>
     </form>`;
-    return html`<div class="friends-online-backdrop">
+    return html`<div class="friends-online-backdrop" @keydown=${this.dialogKey}>
       <section
         class="friends-online-panel fo-panel"
         role="dialog"
@@ -682,11 +718,7 @@ export class FriendsOnline extends LitElement {
           </div>
           <button
             aria-label="Close multiplayer"
-            @click=${async () => {
-              await this.cancelQueue?.();
-              this.opened = false;
-              this.directoryOff?.();
-            }}
+            @click=${() => this.closePanel()}
           >
             Close
           </button>
@@ -712,17 +744,36 @@ export class FriendsOnline extends LitElement {
                       </details>`
                     : nameForm
                 }
-                <friends-party-lobby
-                  .uid=${this.user.uid}
-                  .displayName=${this.savedDisplayName}
-                  .activity=${this.roomActivity}
-                  @party-launch=${() => {
-                    this.opened = false;
-                    this.directoryOff?.();
-                  }}
-                ></friends-party-lobby>
-                <details class="fo-classic" ?open=${this.busy}>
-                  <summary>Quick play & classic servers</summary>
+                <nav class="fo-mode-nav" aria-label="Multiplayer mode">
+                  <button
+                    aria-pressed=${this.section === "friends"}
+                    @click=${() => (this.section = "friends")}
+                  >
+                    Play with friends <small>Private · 1v1 / 2v2</small>
+                  </button>
+                  <button
+                    aria-pressed=${this.section === "servers"}
+                    @click=${() => (this.section = "servers")}
+                  >
+                    Find a match <small>Quick play · public servers</small>
+                  </button>
+                </nav>
+                <div ?hidden=${this.section !== "friends"}>
+                  <friends-party-lobby
+                    .uid=${this.user.uid}
+                    .displayName=${this.savedDisplayName}
+                    .activity=${this.roomActivity}
+                    @party-launch=${() => {
+                      this.opened = false;
+                      this.directoryOff?.();
+                    }}
+                  ></friends-party-lobby>
+                </div>
+                <section
+                  class="fo-classic"
+                  ?hidden=${this.section !== "servers"}
+                >
+                  <h3>Quick play & public servers</h3>
                   ${this.renderServers()}
                   <div class="fo-quick">
                     <button
@@ -742,73 +793,87 @@ export class FriendsOnline extends LitElement {
                     >Quick play searches for 20 seconds, then starts a Normal AI
                     game if nobody joins.</small
                   >
-                </details>
+                </section>
               `
             : html`
-                <div class="fo-auth-intro">
-                  <h3>Your next match starts here.</h3>
-                  <p>
-                    Sign in to create a room or join your friends. Solo and
-                    missions are available without an account.
-                  </p>
+                <div class="fo-auth-grid">
+                  <aside class="fo-auth-story">
+                    <span class="fh-eyebrow">BETTER TOGETHER</span>
+                    <h3>Bring your allies.<br />Build your empire.</h3>
+                    <p>One world. Your strategy.</p>
+                    <ul>
+                      <li>Private rooms with shareable codes</li>
+                      <li>1v1 battles and 2v2 teams</li>
+                      <li>Map voting and reconnectable matches</li>
+                    </ul>
+                  </aside>
+                  <div class="fo-auth-card">
+                    <div class="fo-auth-intro">
+                      <h3>Your next match starts here.</h3>
+                      <p>
+                        Sign in to create a room or join your friends. Solo and
+                        missions are available without an account.
+                      </p>
+                    </div>
+                    <button
+                      class="fo-primary fo-google"
+                      ?disabled=${this.busy}
+                      @click=${() => this.googleSignIn()}
+                    >
+                      Continue with Google <span aria-hidden="true">↗</span>
+                    </button>
+                    <details class="fo-email">
+                      <summary>Use email instead</summary>
+                      <form
+                        @submit=${(event: Event) => {
+                          event.preventDefault();
+                          void this.emailAuth();
+                        }}
+                      >
+                        <div class="fo-email-fields">
+                          <label
+                            >Email<input
+                              type="email"
+                              autocomplete="email"
+                              required
+                              @input=${(event: Event) => (this.email = (event.target as HTMLInputElement).value)} /></label
+                          ><label
+                            >Password<input
+                              type="password"
+                              autocomplete="current-password"
+                              required
+                              minlength="6"
+                              .value=${this.password}
+                              @input=${(event: Event) => (this.password = (event.target as HTMLInputElement).value)}
+                          /></label>
+                        </div>
+                        <div class="online-buttons">
+                          <button ?disabled=${this.busy}>Sign in</button
+                          ><button
+                            type="button"
+                            ?disabled=${this.busy}
+                            @click=${() => this.emailAuth(true)}
+                          >
+                            Create account</button
+                          ><button
+                            type="button"
+                            ?disabled=${this.busy}
+                            @click=${() =>
+                              this.action(async () => {
+                                await sendPasswordResetEmail(
+                                  friendsAuth,
+                                  this.email,
+                                );
+                                this.status = "Password reset email sent.";
+                              })}
+                          >
+                            Reset password
+                          </button>
+                        </div>
+                      </form>
+                    </details>
+                  </div>
                 </div>
-                <button
-                  class="fo-primary fo-google"
-                  ?disabled=${this.busy}
-                  @click=${() => this.googleSignIn()}
-                >
-                  Continue with Google <span aria-hidden="true">↗</span>
-                </button>
-                <details class="fo-email">
-                  <summary>Use email instead</summary>
-                  <form
-                    @submit=${(event: Event) => {
-                      event.preventDefault();
-                      void this.emailAuth();
-                    }}
-                  >
-                    <div class="fo-email-fields">
-                      <label
-                        >Email<input
-                          type="email"
-                          autocomplete="email"
-                          required
-                          @input=${(event: Event) => (this.email = (event.target as HTMLInputElement).value)} /></label
-                      ><label
-                        >Password<input
-                          type="password"
-                          autocomplete="current-password"
-                          required
-                          minlength="6"
-                          .value=${this.password}
-                          @input=${(event: Event) => (this.password = (event.target as HTMLInputElement).value)}
-                      /></label>
-                    </div>
-                    <div class="online-buttons">
-                      <button ?disabled=${this.busy}>Sign in</button
-                      ><button
-                        type="button"
-                        ?disabled=${this.busy}
-                        @click=${() => this.emailAuth(true)}
-                      >
-                        Create account</button
-                      ><button
-                        type="button"
-                        ?disabled=${this.busy}
-                        @click=${() =>
-                          this.action(async () => {
-                            await sendPasswordResetEmail(
-                              friendsAuth,
-                              this.email,
-                            );
-                            this.status = "Password reset email sent.";
-                          })}
-                      >
-                        Reset password
-                      </button>
-                    </div>
-                  </form>
-                </details>
               `
         }
         <p class="fo-status" role="status" aria-live="polite">${this.status}</p>

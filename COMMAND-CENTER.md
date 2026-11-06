@@ -44,3 +44,7 @@ Validation: production Pages build/TypeScript passed; eight targeted tests passe
 ## Hosted account sign-in fix (2026-11-06)
 Hosted provider entry points now use Firebase instead of the original server OAuth API. Solo setup says Multiplayer account rather than promising unsupported official achievements. The account panel explains local solo saves and achievement limits. Production build and 16 focused tests passed; isolated Chrome opened the real Google login popup without localhost navigation. Personal Google sign-in was not completed. Unrelated upstream cosmetics requests to localhost remain a follow-up issue.
 
+
+## Menu system refresh (2026-11-06)
+Unified navy modal surfaces, consistent headers and tabs across solo/settings/help, redesigned Google/email account screen, separate friends-room and public-match sections, responsive room settings and readable input targets. Multiplayer supports Escape, focus containment and focus restoration. Build and ten targeted tests passed. Chrome checked desktop/320/390 account layouts and solo/settings/help. Signed-in friends/server tabs were visual fixtures; no account or real room was created in these checks.
+

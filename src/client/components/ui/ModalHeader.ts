@@ -13,7 +13,8 @@ export interface ModalHeaderProps {
   showDivider?: boolean;
 }
 
-const DEFAULT_WRAPPER_CLASS = "flex flex-wrap items-center gap-2 shrink-0";
+const DEFAULT_WRAPPER_CLASS =
+  "friends-menu-header flex flex-wrap items-center gap-2 shrink-0";
 const DEFAULT_DIVIDER_CLASS = "border-b border-white/10";
 const DEFAULT_PADDING_CLASS = "p-4 lg:p-6";
 const DEFAULT_LEFT_CLASS = "flex items-center gap-4 flex-1";
