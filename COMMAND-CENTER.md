@@ -48,3 +48,11 @@ Hosted provider entry points now use Firebase instead of the original server OAu
 ## Menu system refresh (2026-11-06)
 Unified navy modal surfaces, consistent headers and tabs across solo/settings/help, redesigned Google/email account screen, separate friends-room and public-match sections, responsive room settings and readable input targets. Multiplayer supports Escape, focus containment and focus restoration. Build and ten targeted tests passed. Chrome checked desktop/320/390 account layouts and solo/settings/help. Signed-in friends/server tabs were visual fixtures; no account or real room was created in these checks.
 
+
+## Host resource controls (2026-11-06)
+
+In new solo games and hosted casual private matches, a tiny white dot at bottom-right opens Host controls. Enter an amount (1 to 1 billion) for gold or troop grants, or enable/disable engine infinite gold and troops. Changes affect the host's own nation. Engine infinite troops raises capacity rather than using non-finite numbers; grants over normal capacity remain subject to normal population rules unless infinite troops is enabled. Gold's infinite mode makes host building costs free. Guests and public games are rejected in the worker, even if a command is submitted manually.
+
+Commands travel as stamped simulation intents and execute in deterministic turn order on each peer. Host identity is established at game creation, and room protocol versions were advanced so older tabs cannot join new rooms. Refresh all players and create a new room; older saves without creator metadata retain their previous behavior. Snapshot restoration preserves granted resources and host settings.
+
+Validation: production build/TypeScript and 30 tests passed, including two independent engine worlds, grants, authority checks, invalid values, enabled/disabled snapshot restoration, panel controls and cleanup, existing missions/aircraft and party behavior. Real Chrome against local artifacts verified the dot, a million-gold grant, infinite troops across advancing ticks, committed gold toggles and closing. Actual networked multiplayer admin play has not been completed. These changes do not claim a complete game audit or a measured FPS gain.

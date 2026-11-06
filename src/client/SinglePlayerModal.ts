@@ -1230,6 +1230,7 @@ export class SinglePlayerModal extends BaseModal {
           players: [
             {
               clientID,
+              isLobbyCreator: true,
               username: resolvedName.name,
               clanTag: usernameInput?.getClanTag() ?? null,
               cosmetics,

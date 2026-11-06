@@ -1,4 +1,5 @@
 import { TileRef } from "@openfront/engine-api/game/GameMap";
+import { GameType } from "@openfront/engine-api/game/GameTypes";
 import {
   BuildableUnit,
   PlayerType,
@@ -11,6 +12,7 @@ import {
   GameUpdateViewData,
   HashUpdate,
 } from "@openfront/engine-api/game/GameUpdates";
+import { FriendsAdminIntentSchema } from "@openfront/engine-api/Schemas";
 import { ClientID, GameID } from "@openfront/engine-api/Schemas";
 import { Config } from "@openfront/engine-lib/configuration/Config";
 import { TerrainMapData } from "@openfront/engine-lib/game/TerrainMapLoader";
@@ -1212,6 +1214,34 @@ export class ClientGameRunner {
             `got wrong turn have turns ${this.turnsSeen}, received turn ${message.turn.turnNumber}`,
           );
         } else {
+          // Mirror committed host settings for UI capacity/cost calculations.
+          // The worker independently validates and applies the authoritative command.
+          for (const intent of message.turn.intents) {
+            if (intent.type !== "friends_admin") continue;
+            const parsed = FriendsAdminIntentSchema.safeParse(intent);
+            const player = this.gameView.playerByClientID(intent.clientID);
+            const config = this.gameView.config().gameConfig();
+            if (
+              !parsed.success ||
+              !player?.isAlive() ||
+              !player.isLobbyCreator()
+            )
+              continue;
+            if (
+              config.gameType !== GameType.Singleplayer &&
+              !(config.gameType === GameType.Private && config.friendsAdmin)
+            )
+              continue;
+            if (
+              parsed.data.action === "infiniteGold" ||
+              parsed.data.action === "infiniteTroops"
+            ) {
+              config.hostCheats = {
+                ...config.hostCheats,
+                [parsed.data.action]: parsed.data.enabled,
+              };
+            }
+          }
           this.worker.sendTurn(
             // Filter out pause intents in replays
             this.gameView.config().isReplay()
@@ -1739,19 +1769,39 @@ function showErrorModal(
   modal.appendChild(button);
   if (process.env.FRIENDS_STATIC === "true") {
     const recovery = document.createElement("section");
-    recovery.style.cssText="padding:16px;border-top:1px solid #888;margin-top:14px;color:inherit";
+    recovery.style.cssText =
+      "padding:16px;border-top:1px solid #888;margin-top:14px;color:inherit";
     modal.appendChild(recovery);
-    void import("./FriendsSaves").then(async saves => {
-      for (const previous of [false,true]) {
-        const save=await saves.readCampaign(previous); if(!save) continue;
-        const resume=document.createElement("button");
-        resume.className="copy-btn";
-        resume.textContent=`${previous?"Try previous checkpoint":"Resume last safe save"} — ${new Date(save.savedAt).toLocaleTimeString()}`;
-        resume.onclick=async()=>{resume.disabled=true;try{await saves.resumeCampaign(previous);modal.remove()}catch{resume.disabled=false;resume.textContent="Could not restore this checkpoint. Try the other save."}};
-        recovery.appendChild(resume);
-      }
-      const help=document.createElement("p");help.textContent="Recovery continues the saved world locally. Use Multiplayer → Rejoin for a shared room.";recovery.appendChild(help);
-    }).catch(()=>{recovery.textContent="Saved-world recovery is unavailable in this browser."});
+    void import("./FriendsSaves")
+      .then(async (saves) => {
+        for (const previous of [false, true]) {
+          const save = await saves.readCampaign(previous);
+          if (!save) continue;
+          const resume = document.createElement("button");
+          resume.className = "copy-btn";
+          resume.textContent = `${previous ? "Try previous checkpoint" : "Resume last safe save"} — ${new Date(save.savedAt).toLocaleTimeString()}`;
+          resume.onclick = async () => {
+            resume.disabled = true;
+            try {
+              await saves.resumeCampaign(previous);
+              modal.remove();
+            } catch {
+              resume.disabled = false;
+              resume.textContent =
+                "Could not restore this checkpoint. Try the other save.";
+            }
+          };
+          recovery.appendChild(resume);
+        }
+        const help = document.createElement("p");
+        help.textContent =
+          "Recovery continues the saved world locally. Use Multiplayer → Rejoin for a shared room.";
+        recovery.appendChild(help);
+      })
+      .catch(() => {
+        recovery.textContent =
+          "Saved-world recovery is unavailable in this browser.";
+      });
   }
 
   if (closable) {

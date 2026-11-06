@@ -42,7 +42,7 @@ type ListedRoom = {
   createdAt: number;
 };
 type Member = { uid: string; clientID: string; name: string };
-const VERSION = "friends-v3-content-20261104";
+const VERSION = "friends-v4-admin-20261106";
 export const MATCH_WAIT_MS = 20_000;
 export function normalMatch(
   gameID: string,
@@ -52,13 +52,15 @@ export function normalMatch(
   return {
     gameID,
     lobbyCreatedAt: Date.now(),
-    players: players.map((p) => ({
+    players: players.map((p, index) => ({
       clientID: p.clientID,
+      isLobbyCreator: index === 0,
       username: p.name,
       clanTag: null,
     })),
     config: {
       friendsAircraft: true,
+      friendsAdmin: true,
       gameMap: GameMapType.World,
       gameMapSize: GameMapSize.Compact,
       gameType: online ? GameType.Private : GameType.Singleplayer,

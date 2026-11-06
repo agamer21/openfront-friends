@@ -22,7 +22,10 @@ import { PlayerStatsSchema } from "./StatsSchemas";
 export type GameID = string;
 export type ClientID = string;
 
+export type FriendsAdminIntent = z.infer<typeof FriendsAdminIntentSchema>;
+
 export type Intent =
+  | FriendsAdminIntent
   | SpawnIntent
   | AttackIntent
   | CancelAttackIntent
@@ -345,6 +348,7 @@ export const GameConfigSchema = z.object({
   pool: PoolConfigSchema.optional(),
   friendsMode: z.enum(FRIENDS_MISSIONS).optional(),
   friendsAircraft: z.boolean().optional(),
+  friendsAdmin: z.boolean().optional(),
 });
 
 // What a host sends in update_game_config. maxPlayers is the private-lobby
@@ -570,7 +574,15 @@ export const ToggleGameStartTimerIntentSchema = z.object({
   type: z.literal("toggle_game_start_timer"),
 });
 
+export const FriendsAdminIntentSchema = z.object({
+  type: z.literal("friends_admin"),
+  action: z.enum(["gold", "troops", "infiniteGold", "infiniteTroops"]),
+  amount: zb.uint({ max: 1_000_000_000 }),
+  enabled: z.boolean(),
+});
+
 export const IntentSchema = z.discriminatedUnion("type", [
+  FriendsAdminIntentSchema,
   AttackIntentSchema,
   CancelAttackIntentSchema,
   SpawnIntentSchema,

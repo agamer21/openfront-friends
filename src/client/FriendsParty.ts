@@ -11,7 +11,7 @@ import type { WireGameStartInfo } from "@openfront/shared/WireSchemas";
 import type { FriendsSession } from "./FriendsRelay";
 import { roomSettings, type FriendsRoomSettings } from "./FriendsRoomSettings";
 
-export const PARTY_VERSION = "friends-party-v2-content";
+export const PARTY_VERSION = "friends-party-v3-admin-20261106";
 export const PARTY_MAPS = [
   GameMapType.World,
   GameMapType.Europe,
@@ -62,12 +62,14 @@ export function partyStart(
     lobbyCreatedAt: Date.now(),
     players: members.map((member, index) => ({
       clientID: member.clientID,
+      isLobbyCreator: index === 0,
       username: member.name,
       clanTag: null,
       ...(teams ? { teamIndex: index < 2 ? 0 : 1 } : {}),
     })),
     config: {
       friendsAircraft: settings.aircraft,
+      friendsAdmin: true,
       ...(activity !== "standard"
         ? {
             friendsMode: activity,
