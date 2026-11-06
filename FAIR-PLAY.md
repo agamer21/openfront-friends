@@ -9,3 +9,9 @@
 These are concrete protections for the current peer-hosted architecture, not a guarantee against every modified client. The host still orders turns and can withhold, omit or forge otherwise valid actions; local clients and local save files cannot be made authoritative by browser checks. Complete protection against a malicious host requires a trusted authoritative simulation service (or a separately designed authenticated consensus protocol). No such server has been deployed or claimed here.
 
 Verification covers engine denial of old grants, poisoned room configuration, malformed/non-finite actions, sender-ID replacement, invalid turns and flood limits. Two real authenticated browser clients additionally submitted malicious packets through Firebase, checked denial of cross-player writes, continued simulation without resource grants, and exchanged chat. This is separate from HUD geometry/visual checks. Use fresh rooms after refreshing all participants; existing site storage is retained.
+
+## Published verification
+
+Code release 832c0d7 deployed successfully in Pages run 42290698928. Live Chrome repeated all six HUD viewport checks, open/closed Tools with nested panels expanded, adjacent build-button spacing, absent admin UI, no horizontal overflow and no JavaScript page errors. A live two-authenticated-client run again ignored direct forged grant/config/malformed packets, rejected cross-player input writes, continued simulation and delivered chat in Tools. Temporary test accounts and known room records were removed. The duplicate protection toast and large start banner were removed; the top status bar remains the countdown. Mobile builds use a readable horizontal scroll row.
+
+The security boundary above remains: this has not deployed an authoritative match server or made a malicious peer host fully trustworthy. Refresh every participant and start new rooms for the updated protocol. Existing site storage was retained.
