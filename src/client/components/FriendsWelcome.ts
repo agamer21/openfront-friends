@@ -18,6 +18,7 @@ import "./friends-command.css";
 import "./friends-arcade.css";
 import "./friends-lobby.css";
 import "./friends-home.css";
+import "./friends-refresh.css";
 
 @customElement("friends-welcome")
 export class FriendsWelcome extends LitElement {
@@ -145,8 +146,23 @@ export class FriendsWelcome extends LitElement {
       <header class="fh-header">
         <button class="fh-brand" @click=${() => (this.page = "home")}>
           <span aria-hidden="true">◈</span> OPENFRONT
-          <small>FRIENDS EDITION</small></button
-        ><button
+          <small>FRIENDS EDITION</small>
+        </button>
+        <nav class="fh-nav" aria-label="Main menu">
+          <button
+            aria-current=${this.page === "home" ? "page" : "false"}
+            @click=${() => (this.page = "home")}
+          >
+            Play
+          </button>
+          <button
+            aria-current=${this.page === "missions" ? "page" : "false"}
+            @click=${this.missions}
+          >
+            Missions
+          </button>
+        </nav>
+        <button
           class="fh-icon-button"
           @click=${this.toggleSound}
           aria-label=${this.muted ? "Enable sound" : "Mute sound"}
@@ -168,13 +184,14 @@ export class FriendsWelcome extends LitElement {
             </div>`
           : html`
               <div class="fh-intro">
-                <span class="fh-eyebrow">YOUR WORLD. YOUR STRATEGY.</span>
-                <h1>Make your next move.</h1>
+                <span class="fh-eyebrow">THE WORLD IS YOURS TO COMMAND</span>
+                <h1>Choose your next campaign.</h1>
                 <p>
-                  Build a nation, bring your friends, or take on a new
-                  challenge.
+                  Expand your borders. Build your economy. Lead your nation.
+                  Start solo or bring your friends into battle.
                 </p>
               </div>
+              <div class="fh-section-label">CHOOSE HOW TO PLAY</div>
               <div class="fh-play-grid">
                 <button
                   class="fh-play-card fh-primary"
@@ -183,8 +200,8 @@ export class FriendsWelcome extends LitElement {
                 >
                   <span class="fh-card-icon">${commandIcon("flag")}</span
                   ><span class="fh-card-copy"
-                    ><small>AT YOUR PACE</small><strong>Solo</strong
-                    ><span>A world of your own.</span></span
+                    ><small>AT YOUR PACE</small><strong>Play Solo</strong
+                    ><span>Choose a map and take on AI nations.</span></span
                   ><span class="fh-card-arrow">${commandIcon("arrow")}</span>
                 </button>
                 <button
@@ -195,7 +212,9 @@ export class FriendsWelcome extends LitElement {
                   <span class="fh-card-icon">${commandIcon("swords")}</span
                   ><span class="fh-card-copy"
                     ><small>BETTER TOGETHER</small><strong>Multiplayer</strong
-                    ><span>Team up. Take on the world.</span></span
+                    ><span
+                      >Create a room, join friends, or find a match.</span
+                    ></span
                   ><span class="fh-card-arrow">${commandIcon("arrow")}</span>
                 </button>
                 <button
@@ -206,7 +225,9 @@ export class FriendsWelcome extends LitElement {
                   <span class="fh-card-icon">${commandIcon("shield")}</span
                   ><span class="fh-card-copy"
                     ><small>SOMETHING DIFFERENT</small><strong>Missions</strong
-                    ><span>Fresh challenges. Clear goals.</span></span
+                    ><span
+                      >Survival, defense, and objective campaigns.</span
+                    ></span
                   ><span class="fh-card-arrow">${commandIcon("arrow")}</span>
                 </button>
               </div>
@@ -251,9 +272,17 @@ export class FriendsWelcome extends LitElement {
               ${this.saveError ? html`<p class="fh-storage-error" role="status">Saving is unavailable. Allow site storage to keep your progress.</p>` : html``}
             `
       }
+      <details class="fh-help">
+        <summary>New commander? Quick controls</summary>
+        <p>
+          Click unclaimed land to expand. Right-click a nation for diplomacy and
+          attacks. Use the bottom bar to choose your attack strength and build.
+          Scroll to zoom and drag to move the map.
+        </p>
+      </details>
       <footer class="fh-footer">
         <span>© OpenFront and Contributors</span
-        ><a href="https://github.com/AGames21/openfront-friends"
+        ><a href="https://github.com/agamer21/openfront-friends"
           >Source & credits ${commandIcon("arrow")}</a
         >
       </footer>

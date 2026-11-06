@@ -14,6 +14,8 @@ export class FriendsWorldStatus extends LitElement {
     protectedSeconds: number;
     elapsed: number;
   } | null = null;
+  private lastGame: ControlPanel["game"] | undefined;
+  private lastTick = -1;
   private timer: ReturnType<typeof setInterval> | undefined;
   @state() private bannerVisible = false;
   private announcedGame: ControlPanel["game"] | undefined;
@@ -31,6 +33,8 @@ export class FriendsWorldStatus extends LitElement {
     super.disconnectedCallback();
   }
   private refresh() {
+    // Background tabs do no HUD work; the next visible poll catches up.
+    if (document.hidden) return;
     const game = document.querySelector<ControlPanel>("control-panel")?.game;
     if (
       !document.querySelector(".in-game") ||
@@ -38,13 +42,21 @@ export class FriendsWorldStatus extends LitElement {
       game.config().gameConfig().friendsMode
     ) {
       if (this.data) this.data = null;
+      this.lastGame = undefined;
+      this.lastTick = -1;
       return;
     }
     const player = game.myPlayer();
     if (!player || game.inSpawnPhase()) {
       if (this.data) this.data = null;
+      this.lastGame = undefined;
+      this.lastTick = -1;
       return;
     }
+    // Paused simulations need no repeated player scan or Lit render.
+    if (this.lastGame === game && this.lastTick === game.ticks()) return;
+    this.lastGame = game;
+    this.lastTick = game.ticks();
     if (this.announcedGame !== game) {
       this.announcedGame = game;
       this.bannerVisible = true;

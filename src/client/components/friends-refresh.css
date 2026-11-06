@@ -1,0 +1,308 @@
+/* Shared command palette; opaque surfaces avoid filtering the moving map. */
+body:not(.in-game):not(:has(.in-game)) friends-chat {
+  position: static;
+  display: block;
+  margin: 16px auto 32px;
+}
+@media (min-width: 1024px) {
+  .in-game friends-chat, body.in-game friends-chat { bottom: 210px; }
+  .in-game .command-resources {
+    grid-template-columns: 160px minmax(180px, 240px) 200px 100px;
+    justify-content: center;
+  }
+  .in-game .command-resources small { font-size: 10px; }
+  .in-game .command-attack-presets button { font-size: 12px; min-height: 28px; padding: 4px 6px; }
+  .in-game unit-display .command-unit-button { min-width: 64px !important; min-height: 64px !important; }
+  .in-game .command-troops .bg-malibu-blue { background: #45cb98; }
+}
+friends-welcome .friends-home {
+  --fh-text: #edf1ff;
+  --fh-muted: #a7b5d1;
+  --fh-gold: #ffce59;
+  max-width: 1080px;
+  background: #10192c;
+  border-color: #35435f;
+  box-shadow: 0 18px 60px #0006;
+}
+.fh-header {
+  padding: 20px 28px;
+  background: #121d32;
+}
+.fh-nav {
+  display: flex;
+  gap: 6px;
+  margin-left: auto;
+}
+.fh-nav button {
+  border: 1px solid transparent;
+  border-radius: 8px;
+  padding: 10px 16px;
+  min-height: 44px;
+  background: transparent;
+  color: #a7b5d1;
+  font-weight: 700;
+}
+.fh-nav button[aria-current="page"] {
+  color: #ffce59;
+  background: #253149;
+  border-color: #46526b;
+}
+.fh-intro {
+  padding: 36px 32px;
+  isolation: isolate;
+  background:
+    linear-gradient(90deg, #121d32 12%, #121d32b8 70%, #121d3266),
+    var(--friends-menu-map) center 45% / cover;
+  border-bottom: 1px solid #35435f;
+}
+.fh-intro h1 {
+  max-width: 640px;
+  font-size: clamp(30px, 4vw, 46px);
+  letter-spacing: -1.4px;
+}
+.fh-intro p {
+  max-width: 480px;
+  color: #c4cee2;
+}
+.fh-eyebrow,
+.fh-section-label {
+  color: #68e5a9;
+}
+.fh-section-label {
+  padding: 24px 32px 12px;
+  font: 800 10px system-ui;
+  letter-spacing: 0.14em;
+}
+.fh-play-grid {
+  grid-template-columns: 1.25fr 1fr;
+  grid-template-rows: 1fr 1fr;
+  gap: 12px;
+  padding-bottom: 24px;
+}
+.fh-play-card {
+  min-height: 115px;
+  padding: 20px;
+  flex-direction: row;
+  align-items: center;
+  gap: 16px;
+  background: #1a263e;
+  border-color: #35435f;
+}
+.fh-play-card:hover {
+  background: #25344e;
+  border-color: #8196bc;
+  transform: translateY(-2px);
+}
+.fh-primary {
+  grid-row: span 2;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  background: linear-gradient(125deg, #ffe392, #ffc34b);
+  color: #192237;
+  border-color: #ffe092;
+}
+.fh-primary:hover {
+  background: #ffdb7b;
+  border-color: #fff1bb;
+}
+.fh-primary .fh-card-copy strong {
+  font-size: 32px;
+}
+.fh-card-icon {
+  margin: 0;
+  flex-shrink: 0;
+  background: #111b2e66;
+  color: #76e9b2;
+}
+.fh-primary .fh-card-icon {
+  color: #253148;
+  background: #ffffff26;
+}
+.fh-card-copy {
+  gap: 6px;
+  padding-right: 12px;
+}
+.fh-card-copy strong {
+  font-size: 22px;
+}
+.fh-card-copy small {
+  color: #9fb0d1;
+  font-size: 9px;
+}
+.fh-card-copy > span {
+  color: #b9c6df;
+  font-size: 12px;
+}
+.fh-primary .fh-card-copy small,
+.fh-primary .fh-card-copy > span {
+  color: #38415a;
+}
+.fh-card-arrow svg {
+  transform: none;
+}
+.fh-bottom {
+  padding-top: 20px;
+  background: #0d1628;
+}
+.fh-settings select {
+  background: #1a263e;
+  min-height: 44px;
+}
+.fh-continue button {
+  min-height: 44px;
+  color: #ffce59;
+  border-color: #6d6244;
+}
+.fh-help {
+  border-top: 1px solid #35435f;
+  padding: 16px 32px;
+  color: #b5c3dd;
+  font-size: 12px;
+}
+.fh-help summary {
+  cursor: pointer;
+  min-height: 24px;
+  color: #dce6fa;
+}
+.fh-help p {
+  max-width: 720px;
+  line-height: 1.7;
+  margin: 12px 0 0;
+}
+.world-command-status {
+  background: linear-gradient(#192238, #10192c);
+  border-color: #35435f;
+  width: min(614px, calc(100vw - 24px));
+  padding: 12px 18px;
+}
+.world-command-clock {
+  min-width: 100px;
+}
+.world-command-clock small {
+  font-size: 10px;
+}
+.world-command-clock strong {
+  font-size: 25px;
+}
+.world-command-progress header,
+.world-command-progress footer {
+  font-size: 11px;
+}
+.world-command-progress progress {
+  height: 7px;
+  margin: 8px 0;
+}
+.world-command-progress footer > span:last-child {
+  max-width: 210px;
+}
+.world-command-rank {
+  font-variant-numeric: tabular-nums;
+}
+.friends-mission-hud {
+  backdrop-filter: none;
+  background: #121d32;
+}
+@media (min-width: 1024px) {
+  .in-game #friends-hud-stack {
+    max-width: 1190px;
+  }
+  .in-game #friends-control-dock {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    padding: 12px 16px;
+    background: linear-gradient(#1b263d, #101a2d);
+    border-color: #35435f;
+  }
+  .in-game unit-display {
+    border-left: 0;
+    border-top: 1px solid #35435f;
+    padding: 9px 0 0;
+  }
+  .in-game unit-display > div {
+    flex-wrap: nowrap;
+    justify-content: flex-start;
+    overflow-x: auto;
+    scrollbar-width: thin;
+    padding-bottom: 3px;
+  }
+  .in-game unit-display .command-unit-button {
+    flex: 1 0 48px;
+    min-height: 62px;
+    background: #1b263d;
+  }
+  .in-game #friends-hud-stack > tutorial-panel {
+    bottom: 180px;
+  }
+  .in-game .command-fieldguide {
+    bottom: 180px;
+  }
+}
+@media (max-width: 680px) {
+  .fh-header {
+    padding: 14px 16px;
+    flex-wrap: wrap;
+  }
+  .fh-brand {
+    letter-spacing: 0.06em;
+  }
+  .fh-nav {
+    order: 3;
+    width: 100%;
+    margin: 0;
+  }
+  .fh-nav button {
+    flex: 1;
+  }
+  .fh-icon-button {
+    margin-left: auto;
+    min-width: 44px;
+    min-height: 44px;
+  }
+  .fh-intro {
+    padding: 26px 20px;
+  }
+  .fh-section-label {
+    padding: 20px 20px 12px;
+  }
+  .fh-play-grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: auto;
+  }
+  .fh-primary {
+    grid-row: auto;
+    flex-direction: row;
+    align-items: center;
+  }
+  .fh-primary .fh-card-copy strong {
+    font-size: 24px;
+  }
+  .fh-card-arrow {
+    display: none;
+  }
+  .fh-help {
+    padding: 16px 20px;
+  }
+  .world-command-clock {
+    min-width: 65px;
+  }
+  .world-command-clock strong {
+    font-size: 21px;
+  }
+  .world-command-progress header,
+  .world-command-progress footer {
+    font-size: 9px;
+  }
+  .world-command-progress footer > span:last-child {
+    max-width: 120px;
+  }
+}
+@media (prefers-reduced-motion: reduce) {
+  .fh-play-card {
+    transition: none;
+  }
+  .fh-play-card:hover {
+    transform: none;
+  }
+}
