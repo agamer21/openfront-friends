@@ -58,3 +58,9 @@ Commands travel as stamped simulation intents and execute in deterministic turn 
 Validation: production build/TypeScript and 30 tests passed, including two independent engine worlds, grants, authority checks, invalid values, enabled/disabled snapshot restoration, panel controls and cleanup, existing missions/aircraft and party behavior. Real Chrome against local artifacts verified the dot, a million-gold grant, infinite troops across advancing ticks, committed gold toggles and closing. Actual networked multiplayer admin play has not been completed. These changes do not claim a complete game audit or a measured FPS gain.
 
 Hosted builds also skip the unavailable original cosmetics catalog request, using the same default fallback immediately instead of attempting localhost. Existing non-hosted catalog loading remains unchanged.
+
+### Post-release validation
+
+The earlier network-testing limitation is now superseded for 1v1. Two authenticated browser clients over real Firebase, including a live-site run, created a fixed-World private room and spawned both players through the existing spawn-intent path. Only the host had the dot. A million-gold grant appeared on the guest, infinite troops synchronized, and the simulation advanced another 30 ticks without an error modal. Temporary test accounts/profiles and known room records were removed. Full-match/endgame and 2v2 admin use remain untested.
+
+Final checks: 31 tests across six files, production build/TypeScript, targeted lint, live desktop/320/390 menus, solo/settings/help, solo admin actions and real Google popup passed. All players should refresh and create a new room. Final code deployment: 904b153, successful Pages run 42284171141. No overall FPS gain or complete game audit is claimed.
