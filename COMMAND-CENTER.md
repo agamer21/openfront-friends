@@ -76,3 +76,12 @@ Hosted builds also skip the unavailable original cosmetics catalog request, usin
 The earlier network-testing limitation is now superseded for 1v1. Two authenticated browser clients over real Firebase, including a live-site run, created a fixed-World private room and spawned both players through the existing spawn-intent path. Only the host had the dot. A million-gold grant appeared on the guest, infinite troops synchronized, and the simulation advanced another 30 ticks without an error modal. Temporary test accounts/profiles and known room records were removed. Full-match/endgame and 2v2 admin use remain untested.
 
 Final checks: 31 tests across six files, production build/TypeScript, targeted lint, live desktop/320/390 menus, solo/settings/help, solo admin actions and real Google popup passed. All players should refresh and create a new room. Final code deployment: 904b153, successful Pages run 42284171141. No overall FPS gain or complete game audit is claimed.
+
+
+## Four-player reconnects and rematch
+
+The host can choose **Rematch with same settings** in Play with friends after leaving a match. The lobby creates a fresh room code and carries over the previous map, match type, mode, difficulty, starting gold and weapon options. Friends join with the new code. When the previous match used map voting, the rematch uses the map the group played.
+
+Multiplayer relay errors offer **Copy error details** with the message, match ID, next turn and build version. When clipboard access fails, the dialog shows selectable text. Saved and incoming party turns share the same validation before the game applies them.
+
+Four authenticated Chrome clients played a complete 2v2 Capture Points match on Europe over real Firebase. Closing and reopening a guest tab and then the host tab paused the match and resumed all four clients through Rejoin last match. All four reached the results screen. A follow-up on the final local build verified both reconnects, new room settings, an induced desync, the copied report and the manual clipboard fallback. Production build, TypeScript, scoped lint and 36 focused tests passed. Temporary test accounts and known rooms were removed.

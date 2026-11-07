@@ -31,6 +31,7 @@ import { LitElement, html } from "lit";
 import { customElement, state } from "lit/decorators.js";
 import { validateDisplayName } from "../FriendsDisplayName";
 import { friendsAuth, friendsDB } from "../FriendsFirebase";
+import type { FriendsMatchError } from "../FriendsMatchError";
 import type { FriendsSession } from "../FriendsRelay";
 import type { JoinLobbyEvent } from "../Main";
 import "./FriendsPartyLobby";
@@ -117,6 +118,8 @@ export class FriendsOnline extends LitElement {
   @state() private user: User | null = null;
   @state() private busy = false;
   @state() private status = "";
+  @state() private errorDetails = "";
+  @state() private showErrorDetails = false;
   @state() private notice = "";
   @state() private seconds = 20;
   @state() private servers: ListedRoom[] = [];
@@ -181,10 +184,27 @@ export class FriendsOnline extends LitElement {
     }, 12000);
   };
   private matchError = (e: Event) => {
-    this.status = (e as CustomEvent<string>).detail;
+    const error = (e as CustomEvent<FriendsMatchError>).detail;
+    this.status = error.message;
+    this.errorDetails = [
+      error.message,
+      `Match: ${error.gameID}`,
+      `Next turn: ${error.nextTurn}`,
+      `Version: ${error.version}`,
+    ].join("\n");
+    this.showErrorDetails = false;
     this.opened = true;
   };
+  private async copyErrorDetails() {
+    try {
+      await navigator.clipboard.writeText(this.errorDetails);
+      this.status = "Error details copied.";
+    } catch {
+      this.showErrorDetails = true;
+    }
+  }
   open(activity: "standard" | "survival" | "capture" = "standard") {
+    this.errorDetails = "";
     this.returnFocus = document.activeElement as HTMLElement;
     this.roomActivity = activity;
     this.opened = true;
@@ -879,6 +899,27 @@ export class FriendsOnline extends LitElement {
               `
         }
         <p class="fo-status" role="status" aria-live="polite">${this.status}</p>
+        ${
+          this.errorDetails
+            ? html`<div class="fo-status">
+                <button @click=${this.copyErrorDetails}>
+                  Copy error details
+                </button>
+                ${
+                  this.showErrorDetails
+                    ? html`<label
+                        >Copy these details manually<textarea
+                          class="w-full rounded-lg bg-slate-950 p-2 text-white"
+                          readonly
+                          rows="5"
+                          .value=${this.errorDetails}
+                        ></textarea>
+                      </label>`
+                    : ""
+                }
+              </div>`
+            : ""
+        }
         <footer class="fo-footer">
           Private, peer-hosted matches. Keep the host's tab open.
         </footer>

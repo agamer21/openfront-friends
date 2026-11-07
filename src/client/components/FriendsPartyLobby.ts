@@ -1,4 +1,4 @@
-import { Difficulty } from "@openfront/engine-api/game/GameTypes";
+import { Difficulty, UnitType } from "@openfront/engine-api/game/GameTypes";
 import type { GameMapType } from "@openfront/engine-api/game/GameTypes";
 import { generateID } from "@openfront/shared/SharedUtil";
 import type { WireGameStartInfo } from "@openfront/shared/WireSchemas";
@@ -29,6 +29,7 @@ import {
   savePartyResume,
   type PartyInfo,
   type PartyMember,
+  type PartyResume,
 } from "../FriendsParty";
 import type { FriendsSession } from "../FriendsRelay";
 import { roomSettings, type FriendsRoomSettings } from "../FriendsRoomSettings";
@@ -452,6 +453,25 @@ export class FriendsPartyLobby extends LitElement {
       this.dispatchEvent(new CustomEvent("party-launch", { bubbles: true }));
     });
   }
+  private async rematch(saved: PartyResume) {
+    if (this.busy || this.code || saved.session.hostUID !== this.uid) return;
+    const count = saved.session.party?.members.length;
+    if (count !== 2 && count !== 4) return;
+    const config = saved.start.config;
+    this.count = count;
+    this.activity =
+      config.friendsMode === "survival" || config.friendsMode === "capture"
+        ? config.friendsMode
+        : "standard";
+    this.settings = roomSettings({
+      map: config.gameMap,
+      difficulty: config.difficulty,
+      aircraft: config.friendsAircraft === true,
+      nukes: !config.disabledUnits?.includes(UnitType.AtomBomb),
+      startingGold: config.startingGold,
+    });
+    await this.create();
+  }
   private async leave(clearStatus = true) {
     this.cleanup();
     if (this.code && !this.started) {
@@ -518,10 +538,34 @@ export class FriendsPartyLobby extends LitElement {
   }
   render() {
     const disabled = this.busy || !this.uid || !this.displayName;
+    const previous = this.code ? null : readPartyResume(this.uid);
     return html`<section class="friends-party">
       <h3>Play with friends</h3>
       <p>Reconnectable rooms · map voting · 1v1 or 2v2</p>
-      ${readPartyResume(this.uid) ? html`<button @click=${this.rejoin} ?disabled=${this.busy}>Rejoin last match</button><small>Same account and browser. Replays your match; larger worlds can take longer to catch up. Everyone waits if the host disconnects.</small>` : html``}
+      ${
+        previous
+          ? html`<button @click=${this.rejoin} ?disabled=${this.busy}>
+                Rejoin last match</button
+              ><small
+                >Same account and browser. Replays your match; larger worlds can
+                take longer to catch up. Everyone waits if the host
+                disconnects.</small
+              >
+              ${
+                previous.session.hostUID === this.uid
+                  ? html`<button
+                        @click=${() => this.rematch(previous)}
+                        ?disabled=${disabled}
+                      >
+                        Rematch with same settings</button
+                      ><small
+                        >Creates a fresh room with the last map and settings.
+                        Share its new code with your friends.</small
+                      >`
+                  : ""
+              } `
+          : ""
+      }
       ${this.code ? html`<p>Settings: ${this.settings.map} · ${this.settings.difficulty} AI · ${this.settings.startingGold.toLocaleString()} gold · aircraft ${this.settings.aircraft ? "on" : "off"} · nukes ${this.settings.nukes ? "on" : "off"}</p>` : this.renderSettings()}
       ${
         this.code
@@ -585,7 +629,8 @@ export class FriendsPartyLobby extends LitElement {
                   Create room
                 </button>
               </div>
-              <form class="party-join"
+              <form
+                class="party-join"
                 @submit=${(event: Event) => {
                   event.preventDefault();
                   void this.join();

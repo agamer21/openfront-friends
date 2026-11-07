@@ -17,6 +17,7 @@ import {
   secureRoomStartInfo,
 } from "./FriendsFairPlay";
 import { friendsDB } from "./FriendsFirebase";
+import { reportFriendsMatchError } from "./FriendsMatchError";
 
 export interface FriendsSession {
   roomID: string;
@@ -259,8 +260,10 @@ export class FriendsRelay {
     this.stopped = true;
     clearInterval(this.timer);
     this.off.splice(0).forEach((f) => f());
-    document.dispatchEvent(
-      new CustomEvent("friends-online-error", { detail: message }),
+    reportFriendsMatchError(
+      message,
+      this.config.gameStartInfo!.gameID,
+      this.turns.length,
     );
   }
   endGame() {

@@ -23,6 +23,7 @@ import {
   secureRoomStartInfo,
 } from "./FriendsFairPlay";
 import { friendsDB } from "./FriendsFirebase";
+import { reportFriendsMatchError } from "./FriendsMatchError";
 import { memberRoom, savePartyResume } from "./FriendsParty";
 import type { FriendsSession } from "./FriendsRelay";
 
@@ -35,6 +36,7 @@ const engineTurn = ({ turnNumber, intents }: Turn): Turn => ({
  * the shared timeline; rejoining replays that same timeline from turn zero. */
 export class FriendsPartyRelay {
   private session: FriendsSession;
+  private participantIDs: ReadonlySet<string>;
   private off: Unsubscribe[] = [];
   private timer?: ReturnType<typeof setInterval>;
   private connect = () => {};
@@ -55,6 +57,9 @@ export class FriendsPartyRelay {
   constructor(private config: LobbyConfig) {
     secureRoomStartInfo(config.gameStartInfo!);
     this.session = config.friendsSession!;
+    this.participantIDs = new Set(
+      this.session.party!.members.map((member) => member.clientID),
+    );
   }
   updateCallback(
     connect: () => void,
@@ -82,9 +87,11 @@ export class FriendsPartyRelay {
     const s = this.session,
       party = s.party!;
     const history = (await get(this.path("turns"))).val() ?? {};
-    const turns = Object.values(history).map((value) =>
-      JSON.parse(value as string),
-    ) as StoredTurn[];
+    const turns = Object.values(history).map((value) => {
+      const turn = this.decodeTurn(value);
+      if (!turn) throw new Error("Invalid multiplayer turn");
+      return turn;
+    });
     turns.sort((a, b) => a.turnNumber - b.turnNumber);
     turns.forEach((turn, index) => {
       if (turn.turnNumber !== index) throw new Error("Incomplete replay");
@@ -144,8 +151,7 @@ export class FriendsPartyRelay {
         onChildAdded(
           this.path("turns"),
           (snapshot) => {
-            if (!this.stopped)
-              this.acceptTurn(JSON.parse(snapshot.val()) as StoredTurn);
+            if (!this.stopped) this.acceptTurn(snapshot.val());
           },
           () => this.fail("Could not read match history."),
         ),
@@ -244,16 +250,27 @@ export class FriendsPartyRelay {
     this.ready = true;
     this.timer = setInterval(() => this.tick(), 100);
   }
-  private acceptTurn(turn: StoredTurn) {
-    const checked = checkedPeerTurn(
-      turn,
-      new Set(this.session.party!.members.map((member) => member.clientID)),
-    );
-    if (!checked) {
+  private decodeTurn(value: unknown): StoredTurn | null {
+    const checked = checkedPeerTurn(value, this.participantIDs);
+    if (!checked) return null;
+    const inputKeys = (checked as Partial<StoredTurn>).inputKeys ?? [];
+    if (
+      !Array.isArray(inputKeys) ||
+      inputKeys.length > 128 ||
+      inputKeys.some((key) => typeof key !== "string" || key.length > 128)
+    ) {
+      return null;
+    }
+    return { ...checked, inputKeys };
+  }
+  private acceptTurn(value: unknown) {
+    if (this.stopped) return;
+    const turn = this.decodeTurn(value);
+    if (!turn) {
       this.fail("Invalid multiplayer action detected. Start a new room.");
       return;
     }
-    if (this.stopped || turn.turnNumber < this.turns.length) return;
+    if (turn.turnNumber < this.turns.length) return;
     if (turn.turnNumber !== this.turns.length) {
       this.fail("Match history is incomplete. Try Rejoin match.");
       return;
@@ -357,9 +374,12 @@ export class FriendsPartyRelay {
       );
   }
   private fail(text: string) {
+    if (this.stopped) return;
     this.endGame();
-    document.dispatchEvent(
-      new CustomEvent("friends-online-error", { detail: text }),
+    reportFriendsMatchError(
+      text,
+      this.config.gameStartInfo!.gameID,
+      this.turns.length,
     );
   }
   endGame() {

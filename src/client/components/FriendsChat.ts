@@ -124,8 +124,14 @@ export class FriendsChat extends LitElement {
       if (list) list.scrollTop = list.scrollHeight;
     });
   }
-  private notice = (e: Event) =>
-    this.add("Notice", String((e as CustomEvent).detail), true);
+  private notice = (e: Event) => {
+    const detail = (e as CustomEvent<string | { message: string }>).detail;
+    this.add(
+      "Notice",
+      typeof detail === "string" ? detail : detail.message,
+      true,
+    );
+  };
   private changeSession = (event: Event) => {
     this.connection?.close();
     this.connection = undefined;
